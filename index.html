@@ -676,6 +676,7 @@
       height: 100%;
       background: #000;
       z-index: 2;
+      display: none;
     }
     
     .reveal-left {
@@ -714,17 +715,8 @@
       background: rgba(0, 0, 0, 0.72);
       border: 2px solid rgba(255, 255, 255, 0.24);
       border-radius: 4px;
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    
-    #win-msg.play-sequence .win-text {
-      animation: fadeTextIn 1s ease-out 1.6s forwards;
-    }
-    
-    @keyframes fadeTextIn {
-      0% { opacity: 0; transform: translateY(8px); }
-      100% { opacity: 1; transform: translateY(0); }
+      opacity: 1;
+      transform: translateY(0);
     }
     
     .win-text h2 {
@@ -804,6 +796,10 @@
       padding: 14px;
       box-shadow: 0 0 0 2px #222;
     }
+
+    #inventory-menu .modal-panel {
+      height: min(620px, 78vh);
+    }
     
     #menu-modal .menu-close,
     #inventory-menu .menu-close,
@@ -864,6 +860,16 @@
       border: 1px solid #333;
       margin-bottom: 6px;
     }
+
+    .craft-section {
+      margin: 12px 0 6px;
+      font-size: 8px;
+      letter-spacing: 1px;
+      opacity: 0.65;
+      border-bottom: 1px solid #333;
+      padding-bottom: 4px;
+      text-transform: uppercase;
+    }
     
     .item-actions {
       display: flex;
@@ -878,6 +884,11 @@
       font-family: inherit;
       background: #000;
       color: #fff;
+    }
+
+    .item-btn.toggle-btn {
+      min-width: 38px;
+      text-align: center;
     }
     
     .item-btn:active {
@@ -903,6 +914,26 @@
     
     .menu-item.craftable:active {
       background: #333;
+    }
+
+    .need-chip {
+      display: inline-block;
+      padding: 2px 4px;
+      border: 1px solid #333;
+      margin-left: 4px;
+      font-size: 6px;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .need-ok {
+      color: #fff;
+      border-color: #777;
+    }
+
+    .need-miss {
+      color: #888;
+      border-color: #333;
     }
     
     .shop-item {
@@ -1176,9 +1207,9 @@
     <div class="modal-panel">
       <div class="menu-close" onclick="closeMenus()">✕</div>
       <h3>MENU</h3>
-      <div class="menu-item"><span>SFX</span><div class="item-actions"><button class="item-btn" id="sfx-toggle" onclick="toggleSfx()">ON</button></div></div>
-      <div class="menu-item"><span>MUSIC</span><div class="item-actions"><button class="item-btn" id="music-toggle" onclick="toggleMusic()">ON</button></div></div>
-      <div class="menu-item"><span>GOD MODE</span><div class="item-actions"><button class="item-btn" id="god-toggle" onclick="toggleGodMode()">OFF</button></div></div>
+      <div class="menu-item"><span>SFX</span><div class="item-actions"><button class="item-btn toggle-btn" id="sfx-toggle" onclick="toggleSfx()">ON</button></div></div>
+      <div class="menu-item"><span>MUSIC</span><div class="item-actions"><button class="item-btn toggle-btn" id="music-toggle" onclick="toggleMusic()">ON</button></div></div>
+      <div class="menu-item"><span>GOD MODE</span><div class="item-actions"><button class="item-btn toggle-btn" id="god-toggle" onclick="toggleGodMode()">OFF</button></div></div>
       <div class="controls-heading">CONTROLS</div>
       <div class="controls-map">
         <div class="controls-row"><span>Move</span><span class="key-cap">Arrows / Swipe</span></div>
@@ -1491,6 +1522,133 @@
         lootCount: 8,
         monsterCount: 5,
       },
+      // Floor 6
+      {
+        width: 25, height: 15,
+        maze: [
+          "#########################",
+          "#.....#...........#.....#",
+          "#.###.#.#######.#.#.###.#",
+          "#...#.#.....#...#.#...#.#",
+          "###.#.#####.#.###.###.#.#",
+          "#...#.....#.#...#.....#.#",
+          "#.#######.#.###.#####.#.#",
+          "#.#.....#.#.....#.....#.#",
+          "#.#.###.#.#######.###.#.#",
+          "#.#.#...#.....#...#...#.#",
+          "#.#.#.#####.#.#.###.###.#",
+          "#.#.#.......#.#.....#...#",
+          "#.#.#########.#####.#.###",
+          "#...............#.....#.E",
+          "#########################",
+        ],
+        lootCount: 9,
+        monsterCount: 6,
+      },
+      // Floor 7
+      {
+        width: 27, height: 17,
+        maze: [
+          "###########################",
+          "#.....#.......#.......#...#",
+          "#.###.#.#####.#.#####.#.#.#",
+          "#...#.#.....#.#.....#...#.#",
+          "###.#.#####.#.###.#.#####.#",
+          "#...#.....#.#...#.#.....#.#",
+          "#.#######.#.###.#.#####.#.#",
+          "#.#.....#.#...#.#.....#.#.#",
+          "#.#.###.#.###.#.###.#.#.#.#",
+          "#.#...#.#.....#...#.#.#...#",
+          "#.###.#.#########.#.###.###",
+          "#...#.#.....#.....#...#...#",
+          "###.#.#####.#.#######.###.#",
+          "#...#.....#.#.......#.....#",
+          "#.#######.#.#######.#####.#",
+          "#...............#.........E",
+          "###########################",
+        ],
+        lootCount: 10,
+        monsterCount: 7,
+      },
+      // Floor 8
+      {
+        width: 29, height: 17,
+        maze: [
+          "#############################",
+          "#.....#.........#.......#...#",
+          "#.###.#.#######.#.#####.#.#.#",
+          "#...#.#.....#...#.....#...#.#",
+          "###.#.#####.#.#######.#####.#",
+          "#...#.....#.#.....#...#.....#",
+          "#.#######.#.###.#.#.###.###.#",
+          "#.#.....#.#...#.#.#...#...#.#",
+          "#.#.###.#.###.#.#.###.###.#.#",
+          "#.#...#.#.....#.#...#.....#.#",
+          "#.###.#.#########.###.#####.#",
+          "#...#.#.....#.....#...#...#.#",
+          "###.#.#####.#.#####.###.#.#.#",
+          "#...#.....#.#.....#...#.#.#.#",
+          "#.#######.#.###.#####.#.#.#.#",
+          "#.............#.........#..E#",
+          "#############################",
+        ],
+        lootCount: 11,
+        monsterCount: 8,
+      },
+      // Floor 9
+      {
+        width: 31, height: 19,
+        maze: [
+          "###############################",
+          "#.....#.........#.......#.....#",
+          "#.###.#.#######.#.#####.#.###.#",
+          "#...#.#.....#...#.....#...#...#",
+          "###.#.#####.#.#######.#####.###",
+          "#...#.....#.#.....#...#.....#.#",
+          "#.#######.#.###.#.#.###.###.#.#",
+          "#.#.....#.#...#.#.#...#...#.#.#",
+          "#.#.###.#.###.#.#.###.###.#.#.#",
+          "#.#...#.#.....#.#...#.....#.#.#",
+          "#.###.#.#########.###.#####.#.#",
+          "#...#.#.....#.....#...#...#...#",
+          "###.#.#####.#.#####.###.#.###.#",
+          "#...#.....#.#.....#...#.#...#.#",
+          "#.#######.#.###.#####.#.###.#.#",
+          "#.#.......#...#.......#.....#.#",
+          "#.#.###############.#########.#",
+          "#.........................#..E#",
+          "###############################",
+        ],
+        lootCount: 12,
+        monsterCount: 9,
+      },
+      // Floor 10
+      {
+        width: 31, height: 19,
+        maze: [
+          "###############################",
+          "#.....#...........#.....#.....#",
+          "#.###.#.#######.#.#.###.#.###.#",
+          "#...#.#.....#...#.#...#.#...#.#",
+          "###.#.#####.#.###.###.#.###.#.#",
+          "#...#.....#.#...#.....#.....#.#",
+          "#.#######.#.###.#######.###.#.#",
+          "#.#.....#.#...#.....#...#...#.#",
+          "#.#.###.#.###.#####.#.###.###.#",
+          "#.#...#.#.....#.....#...#.....#",
+          "#.###.#.#######.#######.#####.#",
+          "#...#.#.....#...#.....#.....#.#",
+          "###.#.#####.#.###.###.#####.#.#",
+          "#...#.....#.#...#...#.....#...#",
+          "#.#######.#.###.###.#####.###.#",
+          "#.#.......#...#.....#.....#...#",
+          "#.#.###############.#.#####.###",
+          "#.........................#..E#",
+          "###############################",
+        ],
+        lootCount: 13,
+        monsterCount: 10,
+      },
     ];
     
     // Game state
@@ -1614,11 +1772,11 @@
       return 'DEADLY';
     }
     
-    function recommendWeaponForDelta(delta) {
+    function recommendWeaponForDelta(requiredPower) {
       const weapons = Object.values(ITEMS)
         .filter(i => i.type === 'weapon' && i.power)
         .sort((a, b) => a.power - b.power);
-      const pick = weapons.find(w => w.power >= delta);
+      const pick = weapons.find(w => w.power >= requiredPower);
       return pick ? pick.name : 'BEST WEAPON';
     }
     
@@ -1690,6 +1848,36 @@
       }
       return path;
     }
+
+    function addLoopBreaks(levelNumber) {
+      if (levelNumber < 6) return;
+      const area = mazeWidth * mazeHeight;
+      let breakCount = 6 + Math.floor(area / 60);
+      if (levelNumber >= 21) {
+        breakCount += 6 + Math.floor(area / 70);
+      } else {
+        breakCount += 3 + Math.floor(area / 90);
+      }
+      let attempts = 0;
+      const maxAttempts = breakCount * 6;
+      while (breakCount > 0 && attempts < maxAttempts) {
+        attempts++;
+        const x = 2 + Math.floor(Math.random() * (mazeWidth - 4));
+        const y = 2 + Math.floor(Math.random() * (mazeHeight - 4));
+        if (maze[y][x] !== '#') continue;
+        const neighbors = [
+          maze[y - 1][x],
+          maze[y + 1][x],
+          maze[y][x - 1],
+          maze[y][x + 1],
+        ];
+        const open = neighbors.filter(n => n === '.' || n === 'E').length;
+        if (open >= 2) {
+          maze[y][x] = '.';
+          breakCount--;
+        }
+      }
+    }
     
     function addHazardsToMaze(levelNumber) {
       if (levelNumber <= 1) return;
@@ -1729,16 +1917,58 @@
       
       const waterCount = Math.min(2 + Math.floor(levelNumber / 4), Math.max(1, Math.floor(pickPool.length * 0.08)));
       const darkCount = Math.min(3 + Math.floor(levelNumber / 3), Math.max(1, Math.floor(pickPool.length * 0.12)));
-      let cursor = 0;
+      const available = new Set(pickPool.map(p => `${p.x},${p.y}`));
+      let pickIndex = 0;
       
-      for (let i = 0; i < waterCount && cursor < pickPool.length; i++, cursor++) {
-        const p = pickPool[cursor];
-        maze[p.y][p.x] = '~';
-      }
-      for (let i = 0; i < darkCount && cursor < pickPool.length; i++, cursor++) {
-        const p = pickPool[cursor];
-        maze[p.y][p.x] = '\'';
-      }
+      const takeSeed = () => {
+        while (pickIndex < pickPool.length) {
+          const seed = pickPool[pickIndex++];
+          const key = `${seed.x},${seed.y}`;
+          if (available.has(key)) {
+            available.delete(key);
+            return seed;
+          }
+        }
+        return null;
+      };
+      
+      const growCluster = (kind, target, minSize, maxSize) => {
+        let placed = 0;
+        let attempts = 0;
+        while (placed < target && attempts < 40) {
+          attempts++;
+          const seed = takeSeed();
+          if (!seed) break;
+          const remaining = target - placed;
+          const desired = Math.min(remaining, minSize + Math.floor(Math.random() * (maxSize - minSize + 1)));
+          const cluster = [];
+          const frontier = [seed];
+          while (frontier.length && cluster.length < desired) {
+            const idx = Math.floor(Math.random() * frontier.length);
+            const cur = frontier.splice(idx, 1)[0];
+            cluster.push(cur);
+            const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+            for (const [dx, dy] of dirs) {
+              const nx = cur.x + dx;
+              const ny = cur.y + dy;
+              const key = `${nx},${ny}`;
+              if (!available.has(key)) continue;
+              if (Math.random() < 0.75 || cluster.length < 2) {
+                available.delete(key);
+                frontier.push({ x: nx, y: ny });
+              }
+            }
+          }
+          if (cluster.length < minSize) continue;
+          for (const cell of cluster) {
+            maze[cell.y][cell.x] = kind;
+          }
+          placed += cluster.length;
+        }
+      };
+      
+      growCluster('~', waterCount, 5, 12);
+      growCluster('\'', darkCount, 6, 13);
     }
     
     function getShopPrice(itemId, basePrice, floor) {
@@ -1980,6 +2210,29 @@
       player.x = data.player?.x ?? player.x;
       player.y = data.player?.y ?? player.y;
       player.hp = data.player?.hp ?? player.hp;
+      
+      // Sanitize saved positions if level layout changed.
+      const isOpenFloor = (x, y) => {
+        if (x < 0 || y < 0 || x >= mazeWidth || y >= mazeHeight) return false;
+        return maze[y][x] === '.';
+      };
+      const isHazard = (x, y, kind) => {
+        if (x < 0 || y < 0 || x >= mazeWidth || y >= mazeHeight) return false;
+        return maze[y][x] === kind;
+      };
+      if (Array.isArray(monsters)) {
+        monsters = monsters.filter(m => isOpenFloor(m.x, m.y));
+      }
+      if (Array.isArray(lootPositions)) {
+        lootPositions = lootPositions.filter(l => isOpenFloor(l.x, l.y));
+      }
+      if (Array.isArray(hiddenHazardLoot)) {
+        hiddenHazardLoot = hiddenHazardLoot.filter(h => isHazard(h.x, h.y, h.kind));
+      }
+      if (!isOpenFloor(player.x, player.y)) {
+        player.x = 1;
+        player.y = 1;
+      }
       updateVisited();
     }
     
@@ -2109,6 +2362,7 @@
       mazeWidth = level.width;
       mazeHeight = level.height;
       maze = level.maze.map(row => row.split(''));
+      addLoopBreaks(levelNumber);
       addHazardsToMaze(levelNumber);
       
       // Recalculate tile size for this level
@@ -2174,7 +2428,10 @@
         const j = Math.floor(Math.random() * (i + 1));
         [hazardTiles[i], hazardTiles[j]] = [hazardTiles[j], hazardTiles[i]];
       }
-      const cacheCount = Math.min(hazardTiles.length, Math.max(1, Math.floor(levelNumber / 3)));
+      const cacheCount = Math.min(
+        hazardTiles.length,
+        Math.max(1, Math.floor(hazardTiles.length * 0.18) + Math.floor(levelNumber / 4))
+      );
       for (let i = 0; i < cacheCount; i++) {
         hiddenHazardLoot.push({ x: hazardTiles[i].x, y: hazardTiles[i].y, kind: hazardTiles[i].kind, claimed: false });
       }
@@ -2255,7 +2512,7 @@
       let attack = 0, shield = 0;
       for (let itemId of inventory) {
         const item = ITEMS[itemId];
-        if (item.type === 'weapon') attack += item.power;
+        if (item.type === 'weapon') attack = Math.max(attack, item.power);
         if (item.type === 'shield') shield += item.block;
       }
       return { attack, shield };
@@ -2499,6 +2756,15 @@
         ctx.fillStyle = playerColor;
         ctx.fillRect(playerPx, playerPy, playerSize, playerSize);
       }
+      // Draw face
+      if (playerFace) {
+        const fontSize = Math.max(6, Math.floor(TILE * 0.42));
+        ctx.font = `${fontSize}px "Press Start 2P", monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#111';
+        ctx.fillText(playerFace, playerPx + playerSize / 2, playerPy + playerSize / 2 + 1);
+      }
 
       // Update HUD
       document.getElementById('floor').textContent = `${currentLevel + 1}`;
@@ -2535,7 +2801,6 @@
             localStorage.setItem('bestTime', bestTime);
           }
           document.getElementById('best-time').textContent = bestTime ? formatTime(bestTime) : '--:--';
-          winMsg.classList.add('play-sequence');
           playSfx('win');
           clearSaveData(false);
           startStarsAnimation();
@@ -2705,14 +2970,46 @@
     
     function renderCraftList() {
       const list = document.getElementById('craft-list');
-      list.innerHTML = RECIPES.map((recipe, i) => {
+      const sections = [
+        {
+          title: 'Weapons',
+          filter: (item) => item.type === 'weapon',
+        },
+        {
+          title: 'Equipment',
+          filter: (item) => item.type === 'shield' || item.type === 'utility',
+        },
+        {
+          title: 'Health',
+          filter: (item) => item.type === 'food',
+        },
+      ];
+      
+      const renderRecipe = (recipe, i) => {
         const result = ITEMS[recipe.result];
-        const needs = Object.entries(recipe.need).map(([res, count]) => `${count}x ${ITEMS[res].name}`).join(', ');
+        const needs = Object.entries(recipe.need).map(([res, count]) => {
+          const have = countResource(res);
+          const ok = have >= count;
+          const displayHave = Math.min(have, count);
+          return `<span class="need-chip ${ok ? 'need-ok' : 'need-miss'}">${ITEMS[res].name} ${displayHave}/${count}</span>`;
+        }).join(' ');
         const canCraft = Object.entries(recipe.need).every(([res, count]) => countResource(res) >= count);
         return `<div class="menu-item ${canCraft ? 'craftable' : ''}" style="opacity:${canCraft ? 1 : 0.4}" onclick="craft(${i})">
           <span>${result.name}</span><span style="font-size:6px">${needs}</span>
         </div>`;
+      };
+      
+      const sectionHtml = sections.map(section => {
+        const items = RECIPES
+          .map((recipe, i) => ({ recipe, i }))
+          .filter(({ recipe }) => section.filter(ITEMS[recipe.result]))
+          .map(({ recipe, i }) => renderRecipe(recipe, i))
+          .join('');
+        if (!items) return '';
+        return `<div class="craft-section">${section.title}</div>${items}`;
       }).join('');
+      
+      list.innerHTML = sectionHtml;
     }
     
     function useItem(index) {
@@ -2751,6 +3048,7 @@
       const floor = currentLevel + 1;
       currentShopPrices = {};
       const shopItems = ['wood', 'cloth', 'iron', 'bread', 'meat', 'potion', 'compass', 'boat', 'dagger', 'sword', 'woodshield', 'ironshield'];
+      if (floor >= 6) shopItems.push('crystal');
       if (floor >= 8) shopItems.push('axe', 'crystalshield');
       if (floor >= 10) shopItems.push('crystalblade', 'elixir');
       if (floor >= 14) shopItems.push('goldensword', 'goldenshield');
@@ -2961,11 +3259,12 @@
       for (let m of monsters) {
         if (m.x === x && m.y === y && isVisible(m.x, m.y)) {
           const risk = getThreatTier(m.power);
-          const delta = Math.max(0, m.power - getStats().attack);
+          const stats = getStats();
+          const delta = Math.max(0, m.power - stats.attack);
           if (delta <= 0) {
             showToast(`RISK: ${risk} · CURRENT WEAPON OK`);
           } else {
-            const weapon = recommendWeaponForDelta(delta);
+            const weapon = recommendWeaponForDelta(stats.attack + delta);
             showToast(`RISK: ${risk} · NEED +${delta} ATK (${weapon})`);
           }
           return;
@@ -2995,11 +3294,12 @@
       });
       const m = visible[0];
       const risk = getThreatTier(m.power);
-      const delta = Math.max(0, m.power - getStats().attack);
+      const stats = getStats();
+      const delta = Math.max(0, m.power - stats.attack);
       if (delta <= 0) {
         showToast(`SCAN: ${risk} · WEAPON READY`);
       } else {
-        const weapon = recommendWeaponForDelta(delta);
+        const weapon = recommendWeaponForDelta(stats.attack + delta);
         showToast(`SCAN: ${risk} · NEED +${delta} (${weapon})`);
       }
     }
