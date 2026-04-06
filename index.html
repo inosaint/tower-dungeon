@@ -557,17 +557,31 @@
       align-items: center;
       justify-content: center;
       z-index: 100;
-      padding: 24px;
+      overflow: hidden;
     }
-    
+
     .modal.show {
       display: flex;
     }
-    
+
+    #monster-info-modal {
+      position: fixed;
+      background: rgba(0,0,0,0.8);
+    }
+
     .modal-content {
+      position: relative;
+      width: min(300px, 80vw);
       text-align: center;
-      max-width: 300px;
-      width: 100%;
+      border: 2px solid #fff;
+      background: #050505;
+      padding: 16px;
+      box-shadow: 0 0 0 2px #222;
+    }
+
+    #monster-info-modal .modal-content {
+      width: min(360px, 90vw);
+      max-width: 360px;
     }
     
     .modal h2 {
@@ -1135,7 +1149,17 @@
       <button class="modal-link" id="continue-btn" style="display:none" onclick="continueGame()">CONTINUE</button>
     </div>
   </div>
-  
+
+  <!-- MONSTER INFO MODAL -->
+  <div class="modal" id="monster-info-modal">
+    <div class="modal-content">
+      <h2>MONSTER ENCOUNTER</h2>
+      <div style="margin: 20px 0; text-align: left; font-size: 12px;">
+        <!-- Populated by showMonsterInfoModal() -->
+      </div>
+    </div>
+  </div>
+
   <!-- LEVEL UP MESSAGE -->
   <div class="message" id="level-msg">
     <div class="modal-content">
@@ -1239,18 +1263,25 @@
     
     let TILE = calculateTileSize();
     const FOG_RADIUS = 5;
+
+    // Load monster sprite (DISABLED - using unicode symbols instead)
+    // const monsterSpriteImg = new Image();
+    // monsterSpriteImg.src = 'slime-movement.png';
+    // const SPRITE_COLS = 6;
+    // const SPRITE_ROWS = 3;
+    // let animationFrame = 0;
+    // let animationRafId = null;
     
     // Item definitions - 25 items total
     const ITEMS = {
-      // Resources (5)
-      wood: { name: 'Wood', type: 'resource', price: 3, sell: 1 },
+      // Resources (4)
       cloth: { name: 'Cloth', type: 'resource', price: 3, sell: 1 },
       iron: { name: 'Iron', type: 'resource', price: 8, sell: 3 },
       crystal: { name: 'Crystal', type: 'resource', price: 20, sell: 8 },
       goldore: { name: 'Gold Ore', type: 'resource', price: 40, sell: 15 },
       
       // Weapons (8)
-      stick: { name: 'Stick', type: 'weapon', power: 1, sell: 2 },
+      stick: { name: 'Torch', type: 'weapon', power: 1, sell: 2 },
       club: { name: 'Club', type: 'weapon', power: 2, sell: 4 },
       dagger: { name: 'Dagger', type: 'weapon', power: 3, price: 15, sell: 8 },
       spear: { name: 'Spear', type: 'weapon', power: 4, sell: 12 },
@@ -1281,17 +1312,17 @@
     // Crafting recipes
     const RECIPES = [
       // Weapons
-      { need: { wood: 1 }, result: 'stick' },
-      { need: { wood: 2 }, result: 'club' },
+      { need: { stick: 1 }, result: 'stick' },
+      { need: { stick: 2 }, result: 'club' },
       { need: { iron: 2 }, result: 'dagger' },
       { need: { stick: 1, iron: 1 }, result: 'spear' },
       { need: { iron: 2, stick: 1 }, result: 'sword' },
-      { need: { iron: 4, wood: 2, dagger: 1 }, result: 'axe' },
+      { need: { iron: 4, stick: 2, dagger: 1 }, result: 'axe' },
       { need: { crystal: 3, sword: 1 }, result: 'crystalblade' },
       { need: { goldore: 2, crystalblade: 1 }, result: 'goldensword' },
       // Shields
       { need: { cloth: 2 }, result: 'clothwrap' },
-      { need: { wood: 3 }, result: 'woodshield' },
+      { need: { stick: 3 }, result: 'woodshield' },
       { need: { iron: 3 }, result: 'ironshield' },
       { need: { crystal: 3 }, result: 'crystalshield' },
       { need: { goldore: 3 }, result: 'goldenshield' },
@@ -1300,21 +1331,21 @@
       { need: { crystal: 1, potion: 1 }, result: 'elixir' },
       // Utility
       { need: { iron: 1, crystal: 1 }, result: 'compass' },
-      { need: { wood: 4, cloth: 2 }, result: 'boat' },
+      { need: { stick: 4, cloth: 2 }, result: 'boat' },
     ];
     
     // Loot tables with rarity weights (higher = more common)
     function getLootTable(floor) {
       if (floor <= 1) return [
-        { item: 'wood', weight: 30 },
+        { item: 'stick', weight: 30 },
         { item: 'cloth', weight: 30 },
         { item: 'bread', weight: 20 },
-        { item: 'wood', weight: 15 },
+        { item: 'stick', weight: 15 },
         { item: 'cloth', weight: 15 },
-        { item: 'stick', weight: 5 },
+        { item: 'meat', weight: 5 },
       ];
       if (floor <= 2) return [
-        { item: 'wood', weight: 25 },
+        { item: 'stick', weight: 25 },
         { item: 'cloth', weight: 25 },
         { item: 'iron', weight: 15 },
         { item: 'bread', weight: 15 },
@@ -1323,7 +1354,7 @@
         { item: 'clothwrap', weight: 5 },
       ];
       if (floor <= 3) return [
-        { item: 'wood', weight: 20 },
+        { item: 'stick', weight: 20 },
         { item: 'cloth', weight: 20 },
         { item: 'iron', weight: 12 },
         { item: 'meat', weight: 15 },
@@ -1334,7 +1365,7 @@
       ];
       if (floor <= 4) return [
         { item: 'iron', weight: 16 },
-        { item: 'wood', weight: 18 },
+        { item: 'stick', weight: 18 },
         { item: 'cloth', weight: 18 },
         { item: 'crystal', weight: 12 },
         { item: 'meat', weight: 10 },
@@ -1347,7 +1378,7 @@
         { item: 'iron', weight: 10 },
         { item: 'crystal', weight: 14 },
         { item: 'goldore', weight: 6 },
-        { item: 'wood', weight: 14 },
+        { item: 'stick', weight: 14 },
         { item: 'cloth', weight: 14 },
         { item: 'potion', weight: 15 },
         { item: 'meat', weight: 12 },
@@ -1662,6 +1693,8 @@
     let lootPositions = [];
     let hiddenHazardLoot = [];
     let monsterMoveTimer = null;
+    let starsAnimationFrame = null;
+    let starsResizeHandler = null;
     let timerInterval = null;
     let startTime = 0;
     let elapsedTime = 0;
@@ -1675,11 +1708,10 @@
     const NAME_PREFIX = ['Iron', 'Ash', 'Rune', 'Night', 'Wild', 'Ember', 'Stone', 'Silent', 'Dusk', 'Frost'];
     const NAME_SUFFIX = ['Walker', 'Warden', 'Seeker', 'Blade', 'Scout', 'Guard', 'Rider', 'Hunter', 'Keeper', 'Nomad'];
     let characterName = '';
-    let starsAnimationFrame = null;
-    let starsResizeHandler = null;
     let runFlags = {
       tutorialShieldGranted: false,
-      shieldTipShown: false
+      shieldTipShown: false,
+      monsterInfoShown: false
     };
     const FLOOR_LIMIT = 10;
     
@@ -1706,7 +1738,6 @@
     let maze = [];
     let mazeWidth = 0;
     let mazeHeight = 0;
-    let ambientRenderTimer = null;
     let currentShopPrices = {};
     
     function randomCharacterName() {
@@ -2330,14 +2361,8 @@
       document.getElementById('intro-modal').classList.remove('show');
       gameState = 'playing';
       inventory = ['stick']; // Start with a torch/stick for thematic consistency
-      runFlags = { tutorialShieldGranted: false, shieldTipShown: false };
+      runFlags = { tutorialShieldGranted: false, shieldTipShown: false, monsterInfoShown: false };
       showToast('TORCH ACQUIRED');
-      setTimeout(() => {
-        showToast('USE D-PAD TO MOVE');
-      }, 1200);
-      setTimeout(() => {
-        showToast('TAP ENEMY TO CHECK FIGHT RISK');
-      }, 2600);
       await ensureAudioStarted();
       startTimer();
       saveGame(false);
@@ -2403,7 +2428,7 @@
         const pos = floorTiles.pop();
         let power = getMonsterPowerForFloor(levelIndex + 1, i);
         if (levelIndex === 0 && i === 0) power = 1; // safe tutorial fight
-        monsters.push({ x: pos.x, y: pos.y, power, tutorial: levelIndex === 0 && i === 0 });
+        monsters.push({ x: pos.x, y: pos.y, power, tutorial: levelIndex === 0 && i === 0, dir: 'down', moved: false });
       }
       
       // Spawn loot
@@ -2454,11 +2479,16 @@
     }
     
     function moveMonsters() {
+      // Reset moved state
+      for (let m of monsters) {
+        m.moved = false;
+      }
+
       for (let m of monsters) {
         const dx = player.x - m.x;
         const dy = player.y - m.y;
         const dist = Math.abs(dx) + Math.abs(dy);
-        
+
         // Chase if close
         if (dist <= 5) {
           let moveX = 0, moveY = 0;
@@ -2467,31 +2497,44 @@
           } else {
             moveY = dy > 0 ? 1 : -1;
           }
-          
+
           const newX = m.x + moveX;
           const newY = m.y + moveY;
-          
+
           // Check collision with player
           if (newX === player.x && newY === player.y) {
+            // Update direction before combat
+            if (moveX > 0) m.dir = 'right';
+            else if (moveX < 0) m.dir = 'left';
+            else if (moveY > 0) m.dir = 'down';
+            else if (moveY < 0) m.dir = 'up';
             resolveCombat(m);
             return;
           }
-          
+
           // Check valid move
           if (canMonsterMove(newX, newY)) {
             m.x = newX;
             m.y = newY;
+            m.moved = true;
+            // Update direction
+            if (moveX > 0) m.dir = 'right';
+            else if (moveX < 0) m.dir = 'left';
+            else if (moveY > 0) m.dir = 'down';
+            else if (moveY < 0) m.dir = 'up';
           }
         } else {
           // Random wander
           if (Math.random() < 0.3) {
-            const dirs = [[0,1],[0,-1],[1,0],[-1,0]];
-            const [mx, my] = dirs[Math.floor(Math.random() * 4)];
+            const dirs = [[0,1,'down'],[0,-1,'up'],[1,0,'right'],[-1,0,'left']];
+            const [mx, my, dirName] = dirs[Math.floor(Math.random() * 4)];
             const newX = m.x + mx;
             const newY = m.y + my;
             if (canMonsterMove(newX, newY)) {
               m.x = newX;
               m.y = newY;
+              m.moved = true;
+              m.dir = dirName;
             }
           }
         }
@@ -2509,13 +2552,16 @@
     }
     
     function getStats() {
-      let attack = 0, shield = 0;
+      let attack = 0, shield = 0, weaponName = 'torch';
       for (let itemId of inventory) {
         const item = ITEMS[itemId];
-        if (item.type === 'weapon') attack = Math.max(attack, item.power);
+        if (item.type === 'weapon' && item.power > attack) {
+          attack = item.power;
+          weaponName = item.name;
+        }
         if (item.type === 'shield') shield += item.block;
       }
-      return { attack, shield };
+      return { attack, shield, weaponName };
     }
     
     function getFirstShield() {
@@ -2554,14 +2600,16 @@
     
     function resolveCombat(monster) {
       const stats = getStats();
-      
+
       if (stats.attack >= monster.power) {
         // Win - kill monster
-        const goldDrop = 5 + Math.floor(Math.random() * (currentLevel + 1) * 5);
-        gold += goldDrop;
-        showToast(`VICTORY! +${goldDrop} GOLD`);
+        if (Math.random() < 0.2) {
+          const goldDrop = 5 + Math.floor(Math.random() * (currentLevel + 1) * 5);
+          gold += goldDrop;
+          showToast(`VICTORY! +${goldDrop} GOLD`);
+        }
         playSfx('hit');
-        
+
         // Maybe drop loot
         if (Math.random() < 0.5) {
           const drop = getRandomLoot(currentLevel + 1);
@@ -2710,34 +2758,41 @@
       // Draw monsters
       for (let m of monsters) {
         if (isVisible(m.x, m.y)) {
+          // Show monster info modal on first sighting of tutorial monster
+          if (m.tutorial && !runFlags.monsterInfoShown) {
+            runFlags.monsterInfoShown = true;
+            showMonsterInfoModal(m);
+          }
+
           const px = m.x * TILE;
           const py = m.y * TILE;
-          ctx.fillStyle = '#444';
-          ctx.fillRect(px + 2, py + 2, TILE - 4, TILE - 4);
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(px + 4, py + 4);
-          ctx.lineTo(px + TILE - 4, py + TILE - 4);
-          ctx.moveTo(px + TILE - 4, py + 4);
-          ctx.lineTo(px + 4, py + TILE - 4);
-          ctx.stroke();
+
+          // Draw sprite if loaded, else fallback
+          // Simple unicode symbol for difficulty indicator
+          const centerX = px + TILE / 2;
+          const centerY = py + TILE / 2;
+          const symbols = [
+            String.fromCodePoint(0x2736), // power 1: ✷
+            String.fromCodePoint(0x2737), // power 2: ✸
+            String.fromCodePoint(0x2738), // power 3: ✹
+            String.fromCodePoint(0x2739), // power 4: ✺
+            String.fromCodePoint(0x273A)  // power 5+: ✻
+          ];
+          const symbolIndex = Math.min(m.power - 1, symbols.length - 1);
+          const symbol = symbols[Math.max(0, symbolIndex)];
+
+          ctx.fillStyle = '#fff';
+          ctx.font = `bold ${Math.floor(TILE * 0.72)}px serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.strokeStyle = '#000';
           ctx.lineWidth = 1;
-          
-          const delta = m.power - combatStats.attack;
-          const pipCount = delta <= 0 ? 1 : delta <= 2 ? 2 : 3;
-          for (let i = 0; i < pipCount; i++) {
-            const pipX = px + TILE / 2 + (i - (pipCount - 1) / 2) * 5;
-            const pipY = py + 4;
-            ctx.fillStyle = '#ddd';
-            ctx.beginPath();
-            ctx.arc(pipX, pipY, 2.2, 0, Math.PI * 2);
-            ctx.fill();
-          }
-          ctx.lineWidth = 1;
+          ctx.strokeText(symbol, centerX, centerY);
+          ctx.fillText(symbol, centerX, centerY);
+
         }
       }
-      
+
       // Draw player
       const playerPx = player.x * TILE + 2;
       const playerPy = player.y * TILE + 2;
@@ -2776,6 +2831,12 @@
       document.getElementById('bag-count').textContent = inventory.length;
       const bagBtn = document.getElementById('btn-b');
       if (bagBtn) bagBtn.classList.toggle('is-full', inventory.length >= 16);
+    }
+
+    // Simple render loop
+    function startAnimationLoop() {
+      // Use simple draw() call on game events instead of continuous render
+      // Monsters move every 800ms, player input triggers draw immediately
     }
 
     function showMessage(id) {
@@ -2916,7 +2977,7 @@
       inventory = ['stick'];
       gold = 0;
       player.hp = player.maxHp;
-      runFlags = { tutorialShieldGranted: false, shieldTipShown: false };
+      runFlags = { tutorialShieldGranted: false, shieldTipShown: false, monsterInfoShown: false };
       resetTimer();
       loadLevel(0);
       gameState = 'playing';
@@ -3280,6 +3341,47 @@
       }
     }
 
+    function showMonsterInfoModal(monster) {
+      const stats = getStats();
+      const risk = getThreatTier(monster.power);
+
+      // Get unicode symbol for monster power
+      const symbols = [
+        String.fromCodePoint(0x2736), // power 1: ✷
+        String.fromCodePoint(0x2737), // power 2: ✸
+        String.fromCodePoint(0x2738), // power 3: ✹
+        String.fromCodePoint(0x2739), // power 4: ✺
+        String.fromCodePoint(0x273A)  // power 5+: ✻
+      ];
+      const symbolIndex = Math.min(monster.power - 1, symbols.length - 1);
+      const symbol = symbols[Math.max(0, symbolIndex)];
+
+      // Get weapon name from stats
+      const weaponName = stats.weaponName || 'torch';
+
+      const modal = document.getElementById('monster-info-modal');
+      const content = modal.querySelector('.modal-content');
+      content.innerHTML = `
+        <h2>MONSTER DETECTED</h2>
+        <div style="font-size: 48px; margin: 12px 0 28px 0; line-height: 1;">${symbol}</div>
+        <div style="margin: 0; text-align: center; font-size: 11px; color: #d4d4d4;">
+          <div style="margin: 10px 0;"><strong>Threat Level:</strong> ${risk}</div>
+          <div style="margin: 10px 0;"><strong>Power:</strong> ${monster.power}</div>
+          <div style="margin: 10px 0;"><strong>Your Attack:</strong> ${stats.attack} (${weaponName})</div>
+          <div style="margin: 28px 0 0 0; padding: 16px; line-height: 1.5; font-size: 8px; color: #888;">
+            Defeat this monster to earn<br><strong>loot and gold</strong>
+          </div>
+        </div>
+        <button class="modal-btn" onclick="closeMonsterInfoModal()">CLOSE</button>
+      `;
+      modal.classList.add('show');
+    }
+
+    function closeMonsterInfoModal() {
+      const modal = document.getElementById('monster-info-modal');
+      modal.classList.remove('show');
+    }
+
     function centerAction() {
       if (gameState !== 'playing') return;
       const visible = monsters.filter(m => isVisible(m.x, m.y));
@@ -3400,11 +3502,7 @@
     updateContinueButton();
     updateAudioButtons();
     updateGodToggle();
-    if (!ambientRenderTimer) {
-      ambientRenderTimer = setInterval(() => {
-        if (gameState === 'playing') draw();
-      }, 120);
-    }
+    startAnimationLoop();
     draw();
   </script>
 </body>
