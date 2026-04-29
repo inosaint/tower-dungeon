@@ -1,0 +1,21 @@
+[
+  {
+    "id": "wall",
+    "filename": "wall.png",
+    "prompt": "16x16 pixel art tile, dungeon stone brick wall, dark gray bricks with black mortar lines and subtle cracks, seamless repeating tile, top-down view, Game Boy Color palette, 4-5 colors max, hard pixel edges, no anti-aliasing, bold 1px black outline",
+    "size": "1024x1024",
+    "output_format": "png",
+    "background": "transparent",
+    "quality": "high"
+  },
+  {
+    "id": "exit",
+    "filename": "exit.png",
+    "prompt": "16x16 pixel art sprite, downward stone staircase, top-down perspective, steps descending into darkness, Game Boy Color palette, 4-5 colors max, hard pixel edges, no anti-aliasing, bold 1px black outline",
+    "size": "1024x1024",
+    "output_format": "png",
+    "background": "transparent",
+    "quality": "high"
+  }
+]
+

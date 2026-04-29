@@ -1251,7 +1251,32 @@
   <script>
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
-    
+    ctx.imageSmoothingEnabled = false;
+
+    // Strip #FF00FF chroma key from an image, returns a canvas usable with drawImage
+    function stripChroma(img) {
+      const oc = document.createElement('canvas');
+      oc.width = img.naturalWidth;
+      oc.height = img.naturalHeight;
+      const ox = oc.getContext('2d');
+      ox.drawImage(img, 0, 0);
+      const id = ox.getImageData(0, 0, oc.width, oc.height);
+      const d = id.data;
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i] > 200 && d[i+1] < 80 && d[i+2] > 200) d[i+3] = 0;
+      }
+      ox.putImageData(id, 0, 0);
+      return oc;
+    }
+
+    const wallImg = new Image();
+    wallImg.src = 'Gemini_Generated_Image_txv031txv031txv0.png';
+
+    const exitImg = new Image();
+    exitImg.onload = () => { draw(); };
+    exitImg.src = 'Gemini_Generated_Image_holb9rholb9rholb.png';
+
+
     // Calculate tile size based on available space
     function calculateTileSize() {
       const container = document.getElementById('game-container');
@@ -2706,14 +2731,26 @@
           const py = y * TILE;
           
           if (cell === '#') {
-            ctx.fillStyle = `rgba(102, 102, 102, ${alpha})`;
-            ctx.fillRect(px, py, TILE, TILE);
+            if (wallImg.complete && wallImg.naturalWidth > 0) {
+              ctx.globalAlpha = alpha;
+              ctx.drawImage(wallImg, px, py, TILE, TILE);
+              ctx.globalAlpha = 1;
+            } else {
+              ctx.fillStyle = `rgba(102, 102, 102, ${alpha})`;
+              ctx.fillRect(px, py, TILE, TILE);
+            }
           }
           else if (cell === 'E') {
-            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-            ctx.setLineDash([2, 2]);
-            ctx.strokeRect(px + 2, py + 2, TILE - 4, TILE - 4);
-            ctx.setLineDash([]);
+            if (exitImg.complete && exitImg.naturalWidth > 0) {
+              ctx.globalAlpha = alpha;
+              ctx.drawImage(exitImg, px, py, TILE, TILE);
+              ctx.globalAlpha = 1;
+            } else {
+              ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+              ctx.setLineDash([2, 2]);
+              ctx.strokeRect(px + 2, py + 2, TILE - 4, TILE - 4);
+              ctx.setLineDash([]);
+            }
           }
           else if (cell === '~') {
             ctx.strokeStyle = `rgba(68, 102, 170, ${alpha})`;
